@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Public/WIP_PM.h"
 #include "HookedCharacter.generated.h"
 
 class UInputComponent;
@@ -12,6 +13,7 @@ UCLASS(config=Game)
 class AHookedCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
@@ -47,6 +49,12 @@ class AHookedCharacter : public ACharacter
 
 public:
 	AHookedCharacter();
+
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	AWIP_PM *pm;
+
+
 
 protected:
 	virtual void BeginPlay();
