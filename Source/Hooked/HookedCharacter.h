@@ -48,6 +48,43 @@ class AHookedCharacter : public ACharacter
 	class UMotionControllerComponent* L_MotionController;
 
 public:
+
+	// player movement structure
+	struct pml_t {
+		pml_t(){
+			
+		forward = FVector::ForwardVector;
+		right = FVector::RightVector;
+		up = FVector::UpVector;
+		frametime = 0.0f;
+
+		msec = 0;
+
+		walking = false;
+		groundPlane = false;
+
+		impactSpeed = 0.0f;
+
+		previous_origin = FVector::ZeroVector;
+		previous_velocity = FVector::ZeroVector;
+		}
+
+
+	FVector		forward, right, up;
+	float	frametime;
+
+	int32	msec;
+	
+	bool	walking;
+	bool	groundPlane;
+	// trace_t		groundTrace;
+
+	float		impactSpeed;
+
+	FVector		previous_origin;
+	FVector		previous_velocity;
+		
+	};
 	AHookedCharacter();
 
 	
@@ -88,6 +125,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
 
+	
 protected:
 	
 	/** Fires a projectile. */

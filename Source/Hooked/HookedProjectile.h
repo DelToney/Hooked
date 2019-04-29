@@ -19,8 +19,15 @@ class AHookedProjectile : public AActor
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	class UProjectileMovementComponent* ProjectileMovement;
 
+
 public:
 	AHookedProjectile();
+
+	UPROPERTY(VisibleAnywhere)
+	bool grappled;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* BulletMesh;
 
 	/** called when projectile hits something */
 	UFUNCTION()
@@ -30,5 +37,7 @@ public:
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
+	
 };
 
