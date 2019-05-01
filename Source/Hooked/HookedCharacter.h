@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "HookedProjectile.h"
+#include "Runtime/Engine/Classes/PhysicsEngine/PhysicsConstraintComponent.h"
 #include "Public/WIP_PM.h"
 #include "HookedCharacter.generated.h"
+
 
 class UInputComponent;
 
@@ -47,6 +50,9 @@ class AHookedCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UMotionControllerComponent* L_MotionController;
 
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	// class UPhysicsConstraintComponent* GrapplingRope;
+
 public:
 
 	// player movement structure
@@ -87,9 +93,12 @@ public:
 	};
 	AHookedCharacter();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	bool grappled;
+
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
-	AWIP_PM *pm;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	// AWIP_PM *pm;
 
 
 
@@ -100,6 +109,9 @@ public:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
+
+	UPROPERTY(VisibleAnywhere)
+	FVector ropeVector;
 
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -125,6 +137,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	uint32 bUsingMotionControllers : 1;
 
+
+	// UFUNCTION()
+	// void Grapple(AHookedProjectile* hook);
+
+	UFUNCTION()
+	void Ungrapple();	
+
 	
 protected:
 	
@@ -139,6 +158,8 @@ protected:
 
 	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
+
+	
 
 	/**
 	 * Called via input to turn at a given rate.

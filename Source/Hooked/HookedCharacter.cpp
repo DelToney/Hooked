@@ -9,6 +9,7 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/InputSettings.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "Rotator.h"
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
@@ -57,6 +58,8 @@ AHookedCharacter::AHookedCharacter()
 
 	// Default offset from the character location for projectiles to spawn
 	GunOffset = FVector(100.0f, 0.0f, 150.0f);
+
+	// GrapplingRope = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("Grappling Rope"));
 
 	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
@@ -121,6 +124,7 @@ void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerIn
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AHookedCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AHookedCharacter::Ungrapple);
 
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
@@ -138,6 +142,29 @@ void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerIn
 	PlayerInputComponent->BindAxis("TurnRate", this, &AHookedCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AHookedCharacter::LookUpAtRate);
+
+
+}
+
+// void AHookedCharacter::Grapple(AHookedProjectile* hook) {
+// 		// grappled = true;
+// 		ropeVector = hook->GetActorLocation() - this->GetActorLocation();
+
+// 		FVector nextPosition = this->GetActorLocation() + this->GetVelocity() * GetWorld()->GetDeltaSeconds();
+
+// 		this->SetActorLocation(nextPosition);
+// 		float ropeLength = ropeVector.Normalize();
+
+
+// 		// this->SetActorLocation(const FVector& NewLocation);
+// 		// UE_LOG(LogTemp, Log, TEXT("UMyClass %s Attempting to fire."), *GetNameSafe(hook));
+// 		// GrapplingRope->ConstraintActor1 = this;
+// 		UE_LOG(LogTemp, Display, TEXT("%f"), ropeLength);
+// 		// GrapplingRope->ConstraintActor2 = hook;
+// }
+
+void AHookedCharacter::Ungrapple() {
+	
 }
 
 void AHookedCharacter::OnFire()

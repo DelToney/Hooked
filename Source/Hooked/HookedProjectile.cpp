@@ -3,6 +3,7 @@
 #include "HookedProjectile.h"
 #include "Public/GrappleCheck.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+
 #include "Components/SphereComponent.h"
 
 AHookedProjectile::AHookedProjectile() 
@@ -28,26 +29,36 @@ AHookedProjectile::AHookedProjectile()
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 3000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
+	ProjectileMovement->InitialSpeed = 7000.f;
+	ProjectileMovement->MaxSpeed = 10000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = true;
+	ProjectileMovement->bShouldBounce = false;
 
 	// Die after 3 seconds by default
-	InitialLifeSpan = 3.0f;
+	InitialLifeSpan = 30.0f;
+
+	
+	
 }
 
 void AHookedProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	// get player object reference
+	for (TActorIterator<AHookedCharacter> ActorItr(GetWorld()); ActorItr; ++ActorItr) {
+		
+		PlayerObject = *ActorItr;
+	}
+	
 	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL))
 	{
+				UE_LOG(LogTemp, Display, TEXT("COLLIDED"));
 		//get Grapple Check component
 		UGrappleCheck* GrappleCheck = Cast<UGrappleCheck>(OtherActor->GetComponentByClass(UGrappleCheck::StaticClass()));
 		if (GrappleCheck != NULL){
 			if (GrappleCheck->grapplable) {
-				UE_LOG(LogTemp, Display, TEXT("COLLIDED"));
-				grappled = true;
+
+				// PlayerObject->Grapple(this);
 			}
 		}
 		ProjectileMovement->Velocity = FVector::ZeroVector;
