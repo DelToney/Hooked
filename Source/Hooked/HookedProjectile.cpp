@@ -58,7 +58,7 @@ void AHookedProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		if (GrappleCheck != NULL){
 			if (GrappleCheck->grapplable) {
 
-				// PlayerObject->Grapple(this);
+				PlayerObject->Grapple(this);
 			}
 		}
 		ProjectileMovement->Velocity = FVector::ZeroVector;

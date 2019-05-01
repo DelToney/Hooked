@@ -146,7 +146,7 @@ void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerIn
 
 }
 
-// void AHookedCharacter::Grapple(AHookedProjectile* hook) {
+void AHookedCharacter::Grapple(AHookedProjectile* hook) {
 // 		// grappled = true;
 // 		ropeVector = hook->GetActorLocation() - this->GetActorLocation();
 
@@ -161,7 +161,7 @@ void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerIn
 // 		// GrapplingRope->ConstraintActor1 = this;
 // 		UE_LOG(LogTemp, Display, TEXT("%f"), ropeLength);
 // 		// GrapplingRope->ConstraintActor2 = hook;
-// }
+}
 
 void AHookedCharacter::Ungrapple() {
 	

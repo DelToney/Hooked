@@ -138,16 +138,17 @@ public:
 	uint32 bUsingMotionControllers : 1;
 
 
-	// UFUNCTION()
-	// void Grapple(AHookedProjectile* hook);
+	UFUNCTION(BlueprintCallable)
+	void Grapple(AHookedProjectile* hook);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Ungrapple();	
 
 	
 protected:
 	
 	/** Fires a projectile. */
+	UFUNCTION(BlueprintCallable)
 	void OnFire();
 
 	/** Resets HMD orientation and position in VR. */
