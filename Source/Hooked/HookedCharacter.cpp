@@ -1,6 +1,7 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 #include "HookedCharacter.h"
+#include "EngineUtils.h"
 #include "HookedProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -8,6 +9,7 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/InputSettings.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "Rotator.h"
 #include "Kismet/GameplayStatics.h"
 #include "MotionControllerComponent.h"
 #include "XRMotionControllerBase.h" // for FXRMotionControllerBase::RightHandSourceId
@@ -27,7 +29,7 @@ AHookedCharacter::AHookedCharacter()
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
 
-	// Create a CameraComponent	
+	// Create a CameraComponent
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->RelativeLocation = FVector(-39.56f, 1.75f, 64.f); // Position the camera
@@ -44,7 +46,7 @@ AHookedCharacter::AHookedCharacter()
 
 	// Create a gun mesh component
 	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
-	FP_Gun->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
+	FP_Gun->SetOnlyOwnerSee(true); // only the owning player will see this mesh
 	FP_Gun->bCastDynamicShadow = false;
 	FP_Gun->CastShadow = false;
 	// FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
@@ -55,9 +57,11 @@ AHookedCharacter::AHookedCharacter()
 	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
 
 	// Default offset from the character location for projectiles to spawn
-	GunOffset = FVector(100.0f, 0.0f, 10.0f);
+	GunOffset = FVector(100.0f, 0.0f, 150.0f);
 
-	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun 
+	// GrapplingRope = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("Grappling Rope"));
+
+	// Note: The ProjectileClass and the skeletal mesh/anim blueprints for Mesh1P, FP_Gun, and VR_Gun
 	// are set in the derived blueprint asset named MyCharacter to avoid direct content references in C++.
 
 	// Create VR Controllers.
@@ -70,7 +74,7 @@ AHookedCharacter::AHookedCharacter()
 	// Create a gun and attach it to the right-hand VR controller.
 	// Create a gun mesh component
 	VR_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("VR_Gun"));
-	VR_Gun->SetOnlyOwnerSee(true);			// only the owning player will see this mesh
+	VR_Gun->SetOnlyOwnerSee(true); // only the owning player will see this mesh
 	VR_Gun->bCastDynamicShadow = false;
 	VR_Gun->CastShadow = false;
 	VR_Gun->SetupAttachment(R_MotionController);
@@ -79,7 +83,7 @@ AHookedCharacter::AHookedCharacter()
 	VR_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("VR_MuzzleLocation"));
 	VR_MuzzleLocation->SetupAttachment(VR_Gun);
 	VR_MuzzleLocation->SetRelativeLocation(FVector(0.000004, 53.999992, 10.000000));
-	VR_MuzzleLocation->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));		// Counteract the rotation of the VR gun model.
+	VR_MuzzleLocation->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f)); // Counteract the rotation of the VR gun model.
 
 	// Uncomment the following line to turn motion controllers on by default:
 	//bUsingMotionControllers = true;
@@ -87,7 +91,7 @@ AHookedCharacter::AHookedCharacter()
 
 void AHookedCharacter::BeginPlay()
 {
-	// Call the base class  
+	// Call the base class
 	Super::BeginPlay();
 
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
@@ -109,7 +113,7 @@ void AHookedCharacter::BeginPlay()
 //////////////////////////////////////////////////////////////////////////
 // Input
 
-void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
+void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent)
 {
 	// set up gameplay key bindings
 	check(PlayerInputComponent);
@@ -120,6 +124,7 @@ void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AHookedCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AHookedCharacter::Ungrapple);
 
 	// Enable touchscreen input
 	EnableTouchscreenMovement(PlayerInputComponent);
@@ -137,52 +142,89 @@ void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	PlayerInputComponent->BindAxis("TurnRate", this, &AHookedCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AHookedCharacter::LookUpAtRate);
+
+
+}
+
+void AHookedCharacter::Grapple_Implementation(AHookedProjectile* hook) {
+// 		// grappled = true;
+// 		ropeVector = hook->GetActorLocation() - this->GetActorLocation();
+
+// 		FVector nextPosition = this->GetActorLocation() + this->GetVelocity() * GetWorld()->GetDeltaSeconds();
+
+// 		this->SetActorLocation(nextPosition);
+// 		float ropeLength = ropeVector.Normalize();
+
+
+// 		// this->SetActorLocation(const FVector& NewLocation);
+// 		// UE_LOG(LogTemp, Log, TEXT("UMyClass %s Attempting to fire."), *GetNameSafe(hook));
+// 		// GrapplingRope->ConstraintActor1 = this;
+// 		UE_LOG(LogTemp, Display, TEXT("%f"), ropeLength);
+// 		// GrapplingRope->ConstraintActor2 = hook;
+}
+
+void AHookedCharacter::Ungrapple() {
+	
 }
 
 void AHookedCharacter::OnFire()
 {
-	// try and fire a projectile
-	if (ProjectileClass != NULL)
+	TArray<AHookedProjectile *> BulletArray;
+	for (TActorIterator<AHookedProjectile> ActorItr(GetWorld()); ActorItr; ++ActorItr)
 	{
-		UWorld* const World = GetWorld();
-		if (World != NULL)
+		BulletArray.Push(*ActorItr);
+	};
+	UWorld *const World = GetWorld();
+
+	
+	if (BulletArray.Num() < 1)
+	{
+
+		// try and fire a projectile
+		if (ProjectileClass != NULL)
 		{
-			if (bUsingMotionControllers)
-			{
-				const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
-				const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
-				World->SpawnActor<AHookedProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
-			}
-			else
-			{
-				const FRotator SpawnRotation = GetControlRotation();
-				// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-				const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+			
 
-				//Set Spawn Collision Handling Override
-				FActorSpawnParameters ActorSpawnParams;
-				ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+			
+			if (World != NULL)
+			{
+				if (bUsingMotionControllers)
+				{
+					const FRotator SpawnRotation = VR_MuzzleLocation->GetComponentRotation();
+					const FVector SpawnLocation = VR_MuzzleLocation->GetComponentLocation();
+					World->SpawnActor<AHookedProjectile>(ProjectileClass, SpawnLocation, SpawnRotation);
+				}
+				else
+				{
+					const FRotator SpawnRotation = GetControlRotation();
+					// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+					const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
 
-				// spawn the projectile at the muzzle
-				World->SpawnActor<AHookedProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+					//Set Spawn Collision Handling Override
+					FActorSpawnParameters ActorSpawnParams;
+					ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+					// spawn the projectile at the muzzle
+					World->SpawnActor<AHookedProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+				}
 			}
 		}
-	}
 
-	// try and play the sound if specified
-	if (FireSound != NULL)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-		if (AnimInstance != NULL)
+		// try and play the sound if specified
+		if (FireSound != NULL)
 		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
+			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+		}
+
+		// try and play a firing animation if specified
+		if (FireAnimation != NULL)
+		{
+			// Get the animation object for the arms mesh
+			UAnimInstance *AnimInstance = Mesh1P->GetAnimInstance();
+			if (AnimInstance != NULL)
+			{
+				AnimInstance->Montage_Play(FireAnimation, 1.f);
+			}
 		}
 	}
 }
@@ -285,7 +327,7 @@ void AHookedCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-bool AHookedCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerInputComponent)
+bool AHookedCharacter::EnableTouchscreenMovement(class UInputComponent *PlayerInputComponent)
 {
 	if (FPlatformMisc::SupportsTouchInput() || GetDefault<UInputSettings>()->bUseMouseForTouch)
 	{
@@ -296,6 +338,6 @@ bool AHookedCharacter::EnableTouchscreenMovement(class UInputComponent* PlayerIn
 		//PlayerInputComponent->BindTouch(EInputEvent::IE_Repeat, this, &AHookedCharacter::TouchUpdate);
 		return true;
 	}
-	
+
 	return false;
 }
