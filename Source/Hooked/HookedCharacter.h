@@ -138,7 +138,7 @@ public:
 	uint32 bUsingMotionControllers : 1;
 
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent)
 	void Grapple(AHookedProjectile* hook);
 
 	UFUNCTION(BlueprintCallable)

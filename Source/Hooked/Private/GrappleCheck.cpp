@@ -11,7 +11,7 @@ UGrappleCheck::UGrappleCheck()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// ...
-	grapplable = false;
+	grapplable = true;
 }
 
 

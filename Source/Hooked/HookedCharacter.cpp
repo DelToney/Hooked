@@ -146,7 +146,7 @@ void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerIn
 
 }
 
-void AHookedCharacter::Grapple(AHookedProjectile* hook) {
+void AHookedCharacter::Grapple_Implementation(AHookedProjectile* hook) {
 // 		// grappled = true;
 // 		ropeVector = hook->GetActorLocation() - this->GetActorLocation();
 
