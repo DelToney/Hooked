@@ -341,3 +341,11 @@ bool AHookedCharacter::EnableTouchscreenMovement(class UInputComponent *PlayerIn
 
 	return false;
 }
+
+void AHookedCharacter::OnDeath_Implementation() {
+	return;
+}
+
+void AHookedCharacter::OnBoost_Implementation() {
+	return;
+}

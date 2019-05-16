@@ -3,6 +3,8 @@
 #include "HookedGameMode.h"
 #include "HookedHUD.h"
 #include "HookedCharacter.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
 
 AHookedGameMode::AHookedGameMode()
@@ -14,4 +16,25 @@ AHookedGameMode::AHookedGameMode()
 
 	// use our custom HUD class
 	HUDClass = AHookedHUD::StaticClass();
+}
+
+void AHookedGameMode::BeginPlay() {
+	Super::BeginPlay();
+}
+
+
+void AHookedGameMode::CheckLevel() {
+
+}
+
+void AHookedGameMode::EndGame() {
+
+}
+
+void AHookedGameMode::LevelComplete() {
+
+}
+
+void AHookedGameMode::LoadNextLevel() {
+
 }
