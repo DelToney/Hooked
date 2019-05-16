@@ -15,7 +15,7 @@ public:
 	// Sets default values for this actor's properties
 	AKillBox();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	class UBoxComponent* KillZone;
 
 	//Delegate function to "On Component Begin Overlap"

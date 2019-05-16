@@ -13,6 +13,7 @@ ARespawnPoint::ARespawnPoint()
 	SetSpawnPointTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	SetSpawnPointTrigger->SetBoxExtent(FVector(100.f, 100.f, 100.f), true);
 	SetSpawnPointTrigger->BodyInstance.SetCollisionProfileName("DeathBox");
+	SetSpawnPointTrigger->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
 	SetSpawnPointTrigger->GetGenerateOverlapEvents();
 	SetSpawnPointTrigger->OnComponentBeginOverlap.AddDynamic(this, &ARespawnPoint::SetSpawnPoint);
 

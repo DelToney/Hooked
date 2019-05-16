@@ -135,6 +135,9 @@ void AHookedCharacter::SetupPlayerInputComponent(class UInputComponent *PlayerIn
 	PlayerInputComponent->BindAxis("MoveForward", this, &AHookedCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AHookedCharacter::MoveRight);
 
+	//Bind Boost
+	PlayerInputComponent->BindAction("Boost", IE_Pressed, this, &AHookedCharacter::OnBoost);
+
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
@@ -198,7 +201,7 @@ void AHookedCharacter::OnFire()
 				{
 					const FRotator SpawnRotation = GetControlRotation();
 					// MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-					const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation()) + SpawnRotation.RotateVector(GunOffset);
+					const FVector SpawnLocation = ((FP_MuzzleLocation != nullptr) ? FP_MuzzleLocation->GetComponentLocation() : GetActorLocation() + FVector (0.f, 200.f, 0.f)) + SpawnRotation.RotateVector(GunOffset);
 
 					//Set Spawn Collision Handling Override
 					FActorSpawnParameters ActorSpawnParams;

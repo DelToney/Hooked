@@ -2,7 +2,6 @@
 
 #include "HookedGameMode.h"
 #include "HookedHUD.h"
-#include "HookedCharacter.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "UObject/ConstructorHelpers.h"
@@ -32,6 +31,7 @@ void AHookedGameMode::EndGame() {
 }
 
 void AHookedGameMode::LevelComplete() {
+	UE_LOG(LogTemp, Log, TEXT("Level Complete!"));
 
 }
 
