@@ -16,6 +16,8 @@ public:
 	AHookedGameMode();
 
 	void EndGame();
+
+	UFUNCTION(BlueprintNativeEvent)
 	void LevelComplete();
 	void LoadNextLevel();
 

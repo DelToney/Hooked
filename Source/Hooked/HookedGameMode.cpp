@@ -30,8 +30,7 @@ void AHookedGameMode::EndGame() {
 
 }
 
-void AHookedGameMode::LevelComplete() {
-	UE_LOG(LogTemp, Log, TEXT("Level Complete!"));
+void AHookedGameMode::LevelComplete_Implementation() {
 
 }
 

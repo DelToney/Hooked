@@ -60,8 +60,8 @@ void AHookedProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 				PlayerObject->Grapple(this);
 				// UE_LOG(LogTemp, Display, TEXT("target hit %f, %f, %f"), this->Transform.X, this->Transform.Y, this->Transform.Z);
-			}
+			} else this->Destroy();
 		} 
 		ProjectileMovement->Velocity = FVector::ZeroVector;
-	} else this->Destroy();
+	}
 }
